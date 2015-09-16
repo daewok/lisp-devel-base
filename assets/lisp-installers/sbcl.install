@@ -1,0 +1,16 @@
+#! /bin/bash
+
+set -e
+
+# Downloads and installs a binary version of SBCL.
+WORKDIR=/tmp/lisp-installers/sbcl
+
+_URL=http://iweb.dl.sourceforge.net/project/sbcl/sbcl/${SBCL_VERSION}/sbcl-${SBCL_VERSION}-x86-64-linux-binary.tar.bz2
+
+mkdir -p ${WORKDIR}
+cd ${WORKDIR}
+
+curl "${_URL}" | tar xjf -
+
+cd ${WORKDIR}/sbcl-${SBCL_VERSION}-x86-64-linux
+sh install.sh
