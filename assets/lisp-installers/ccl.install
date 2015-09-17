@@ -1,0 +1,14 @@
+#! /bin/bash
+
+set -e
+
+# Download and installs a binary version of CCL.
+_URL=ftp://ftp.clozure.com/pub/release/${CCL_VERSION}/ccl-${CCL_VERSION}-linuxx86.tar.gz
+
+cd /usr/local/src/
+
+curl "${_URL}" | tar xzf -
+
+ln -s /usr/local/src/ccl/scripts/ccl64 /usr/local/bin/ccl
+ln -s /usr/local/src/ccl/scripts/ccl /usr/local/bin/ccl32
+
