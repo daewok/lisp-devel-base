@@ -8,7 +8,7 @@ ENV SBCL_VERSION=1.2.15
 
 # Install lisps and any system dependencies
 RUN apt-get update \
-    && apt-get install -y curl build-essential \
+    && apt-get install -y curl build-essential sudo \
     && chmod +x /tmp/lisp-installers/* \
     && find /tmp/lisp-installers -name "*.install" -exec {} \; \
     && mkdir -p /etc/common-lisp/source-registry.conf.d \
