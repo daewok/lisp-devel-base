@@ -31,6 +31,7 @@ COPY assets/install-quicklisp /usr/local/bin/
 COPY assets/bin/with-user /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/with-user \
+    && mkdir -p /usr/local/share/with-user/post-user-creation-hooks/ \
     && chmod +x /usr/local/bin/install-quicklisp \
     && /usr/local/bin/install-quicklisp \
     && cp /root/.sbclrc /root/.ccl-init.lisp /etc/skel/ \
