@@ -4,11 +4,18 @@ MAINTAINER etimmons@mit.edu
 
 # Install lisps and any system dependencies
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y curl build-essential sudo ca-certificates \
+    && apt-get install --no-install-recommends -y \
+               curl build-essential sudo ca-certificates \
+               libatlas-dev libblas-dev liblapack-dev \
+               graphviz \
+               libgeos-dev \
     && chown -R root:users /usr/local/ \
     && mkdir -p /etc/common-lisp/source-registry.conf.d \
     && mkdir -p /usr/share/common-lisp/source/slime \
     && mkdir -p /usr/local/share/common-lisp \
+    && mkdir /scratch \
+    && chmod 777 /scratch \
+    && chmod g+s /scratch \
     && rm -rf /var/lib/apt
 
 COPY assets/quicklisp-release.key /usr/local/src/
@@ -16,7 +23,7 @@ RUN gpg --import /usr/local/src/quicklisp-release.key
 
 COPY assets/lisp-installers /tmp/lisp-installers
 
-ENV SBCL_VERSION=1.2.16
+ENV SBCL_VERSION=1.3.0
 ENV CCL_VERSION=1.10
 
 RUN chmod +x /tmp/lisp-installers/* \
