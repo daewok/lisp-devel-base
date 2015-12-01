@@ -23,8 +23,8 @@ RUN gpg --import /usr/local/src/quicklisp-release.key
 
 COPY assets/lisp-installers /tmp/lisp-installers
 
-ENV SBCL_VERSION=1.3.0
-ENV CCL_VERSION=1.10
+ENV SBCL_VERSION=1.3.1
+ENV CCL_VERSION=1.11
 
 RUN chmod +x /tmp/lisp-installers/* \
     && find /tmp/lisp-installers -name "*.install" -exec {} \; \
