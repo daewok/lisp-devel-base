@@ -2,45 +2,41 @@ FROM debian:jessie
 
 MAINTAINER etimmons@mit.edu
 
-# Install lisps and any system dependencies
+# Install tools that will be needed even after build time.
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-               curl build-essential sudo ca-certificates \
-               libatlas-dev libblas-dev liblapack-dev \
-               graphviz \
-               libgeos-dev \
-    && chown -R root:users /usr/local/ \
-    && mkdir -p /etc/common-lisp/source-registry.conf.d \
-    && mkdir -p /usr/share/common-lisp/source/slime \
-    && mkdir -p /usr/local/share/common-lisp \
-    && mkdir /scratch \
-    && chmod 777 /scratch \
-    && chmod g+s /scratch \
+    # Needed by ECL (I think) to compile lisp files and used by CFFI (used
+    # commonly enough by most things that it should stay)
+    build-essential \
+    # Needed by ABCL (I'm not familiar enough with ABCL to know if it needs
+    # javac at runtime or access to Java's graphical libraries, so this may need
+    # to eventually change)
+    openjdk-7-jre-headless \
+    && apt-get clean \
     && rm -rf /var/lib/apt
-
-COPY assets/quicklisp-release.key /usr/local/src/
-RUN gpg --import /usr/local/src/quicklisp-release.key
 
 COPY assets/lisp-installers /tmp/lisp-installers
 
 ENV SBCL_VERSION=1.3.1
 ENV CCL_VERSION=1.11
+ENV ECL_VERSION=16.0.0
+ENV ABCL_VERSION=1.3.3
 
 RUN chmod +x /tmp/lisp-installers/* \
+    && /tmp/lisp-installers/init \
     && find /tmp/lisp-installers -name "*.install" -exec {} \; \
+    && /tmp/lisp-installers/clean \
     && rm -rf /tmp/lisp-installers
 
-COPY assets/asdf/*.conf /etc/common-lisp/source-registry.conf.d/
+# Set up folders and volumes.
+RUN mkdir -p /etc/common-lisp/asdf-output-translations.conf.d \
+    && mkdir -p /etc/common-lisp/source-registry.conf.d \
+    && mkdir -p /var/cache/common-lisp \
+    && chmod 1777 /var/cache/common-lisp \
+    && mkdir -p /usr/share/common-lisp/source \
+    && mkdir -p /usr/share/common-lisp/slime \
+    && chmod 1777 /usr/share/common-lisp/source
 
-ADD https://beta.quicklisp.org/quicklisp.lisp /usr/local/src/quicklisp/quicklisp.lisp
-ADD https://beta.quicklisp.org/quicklisp.lisp.asc /usr/local/src/quicklisp/quicklisp.lisp.asc
-COPY assets/install-quicklisp /usr/local/bin/
-COPY assets/bin/with-user /usr/local/bin/
 
-RUN chmod +x /usr/local/bin/with-user \
-    && mkdir -p /usr/local/share/with-user/post-user-creation-hooks/ \
-    && chmod +x /usr/local/bin/install-quicklisp \
-    && /usr/local/bin/install-quicklisp \
-    && cp /root/.sbclrc /root/.ccl-init.lisp /etc/skel/ \
-    && setfacl -d -R -m group:users:rwX /usr/local/ \
-    && setfacl -R -m group:users:rwX /usr/local/
+COPY assets/asdf/50-default-translations.conf /etc/common-lisp/asdf-output-translations.conf.d/
+COPY assets/asdf/50-slime.conf /etc/common-lisp/source-registry.conf.d/

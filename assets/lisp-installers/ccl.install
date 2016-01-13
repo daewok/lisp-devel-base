@@ -2,12 +2,19 @@
 
 set -e
 
-# Download and installs a binary version of CCL.
+if [ -z "${CCL_VERSION}" ]; then
+    exit 0
+fi
+
 _URL=ftp://ftp.clozure.com/pub/release/${CCL_VERSION}/ccl-${CCL_VERSION}-linuxx86.tar.gz
 
 cd /usr/local/src/
 
 curl "${_URL}" | tar xzf -
+
+cd /usr/local/src/ccl
+
+./lx86cl64 -n -e "(rebuild-ccl :full t)" -e "(quit)"
 
 ln -s /usr/local/src/ccl/scripts/ccl64 /usr/local/bin/ccl
 ln -s /usr/local/src/ccl/scripts/ccl /usr/local/bin/ccl32
