@@ -2,25 +2,24 @@ FROM debian:jessie
 
 MAINTAINER etimmons@mit.edu
 
-# Install tools that will be needed even after build time.
+# Install tools that will be needed even after build time. Additionally, created
+# a standard, non-root, user
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     # Needed by ECL (I think) to compile lisp files and used by CFFI (used
-    # commonly enough by most things that it should stay)
+    # commonly enough that it should stay)
     build-essential \
     # Needed by ABCL (I'm not familiar enough with ABCL to know if it needs
     # javac at runtime or access to Java's graphical libraries, so this may need
     # to eventually change)
     openjdk-7-jre-headless \
     && apt-get clean \
-    && rm -rf /var/lib/apt
+    && rm -rf /var/lib/apt \
+    && adduser --gecos "Lisp user." lisp
 
 COPY assets/lisp-installers /tmp/lisp-installers
 
-ENV SBCL_VERSION=1.3.1
-ENV CCL_VERSION=1.11
-ENV ECL_VERSION=16.0.0
-ENV ABCL_VERSION=1.3.3
+ENV SBCL_VERSION=1.3.1 CCL_VERSION=1.11 ECL_VERSION=16.0.0 ABCL_VERSION=1.3.3
 
 RUN chmod +x /tmp/lisp-installers/* \
     && /tmp/lisp-installers/init \
